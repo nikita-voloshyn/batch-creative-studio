@@ -1,0 +1,35 @@
+{
+  "name": "batch-creative-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.31.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@google/genai": "^2.10.0",
+    "@huggingface/inference": "^4.13.20",
+    "@upstash/redis": "^1.38.0",
+    "@vercel/blob": "^2.5.0",
+    "fflate": "^0.8.2",
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.1",
+    "@types/node": "26.0.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitest/coverage-v8": "4.1.9",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

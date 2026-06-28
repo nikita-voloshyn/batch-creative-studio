@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Production / Vercel
+.vercel/
+
+# Environment variables (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Test / coverage output
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+*.pem
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Claude Code — personal allow permissions and MCP config (must NOT be committed)
+.claude/settings.local.json

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(secrets/**)",
+      "Read(~/.ssh/**)",
+      "Write(.env)",
+      "Write(.env.*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "description": "Auto-lint and format edited files with Biome (activates once Biome is configured in the project)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm exec biome check --write \"$CLAUDE_FILE_PATH\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "description": "Scan for hardcoded secrets before session ends",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "grep -rn 'API_KEY\\|SECRET\\|PASSWORD\\|PRIVATE_KEY\\|TOKEN\\|Bearer ' --include='*.ts' --include='*.tsx' --include='*.js' . 2>/dev/null | grep -v node_modules | grep -v '.env.example' | grep -v '.next' | head -20 && echo '[Forgeline] Review any matches above for hardcoded secrets' || true"
+          }
+        ]
+      }
+    ]
+  }
+}
