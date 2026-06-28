@@ -1,0 +1,588 @@
+/*
+ * Batch Creative Studio — visual language foundation (component C1).
+ *
+ * Editorial / utilitarian-brutalist: pure white background, near-black charcoal
+ * text, hierarchy by weight and size (never color), ALL-CAPS small labels, thin
+ * `hr` separators instead of shadowed cards, generous whitespace, the image as
+ * the hero. (README §10 / CLAUDE.md visual language.)
+ *
+ * Owner: frontend (C1). This file holds the design tokens + base element styles
+ * + the small set of component classes used by the uploader, params form, and
+ * page shell. Task 7 (batch grid / tiles) and Task 11 (status labels/badges)
+ * extend it; they reuse the tokens and label/meta primitives defined here.
+ */
+
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  /* Palette — white + charcoal only; status accents are muted and functional. */
+  --color-bg: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-muted: #6b6b6b; /* small meta text (date-stamp register) */
+  --color-faint: #9a9a9a; /* placeholders, disabled */
+  --color-line: rgba(26, 26, 26, 0.12); /* thin separators / borders */
+  --color-line-strong: rgba(26, 26, 26, 0.28);
+  --color-field: #fafafa; /* near-white field fill, not a card */
+  --color-success: #2f6b4f; /* muted green — success status only */
+  --color-error: #9b2c2c; /* muted red — error status only */
+
+  /* Typography — system sans-serif stack (Inter-like, no build-time fetch). */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+
+  /* Type scale — hierarchy by size + weight, not color. */
+  --text-display: 2rem; /* masthead / page title */
+  --text-heading: 1.125rem; /* section headings */
+  --text-body: 1rem; /* ~16px comfortable body */
+  --text-small: 0.8125rem;
+  --text-label: 0.6875rem; /* ALL-CAPS section/status labels */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Layout — left-aligned content under a max-width column, lots of whitespace. */
+  --content-max: 980px;
+  --gutter: 1.5rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  --label-tracking: 0.12em;
+}
+
+/* ── Reset / base ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: var(--space-8) 0;
+}
+
+/* ── Layout primitives ─────────────────────────────────────────────────────── */
+.content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-12) var(--gutter) var(--space-12);
+}
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.masthead__title {
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+
+.masthead__meta {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+.section {
+  margin-top: var(--space-12);
+}
+
+.section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+/* ── Type primitives ───────────────────────────────────────────────────────── */
+.label {
+  display: inline-block;
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.label--muted {
+  color: var(--color-muted);
+  font-weight: var(--weight-medium);
+}
+
+.meta {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+.heading {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.005em;
+}
+
+.lede {
+  color: var(--color-muted);
+  max-width: 60ch;
+}
+
+/* ── Status text (muted, functional) ───────────────────────────────────────── */
+.status {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+.status--pending,
+.status--uploading {
+  color: var(--color-muted);
+}
+.status--uploaded {
+  color: var(--color-success);
+}
+.status--error {
+  color: var(--color-error);
+}
+/* Batch tile statuses (component C4). */
+.status--queued,
+.status--generating {
+  color: var(--color-muted);
+}
+.status--done {
+  color: var(--color-success);
+}
+.status--failed {
+  color: var(--color-error);
+}
+
+/* ── Form controls ─────────────────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  border-radius: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-ink);
+}
+.input:focus,
+.textarea:focus,
+.select:focus,
+.btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 1px;
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-faint);
+}
+.textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+.input:disabled,
+.textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Segmented choice (aspect ratio) — flat, bordered, no shadow. */
+.segmented-field {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+.segmented-field > legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+}
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--color-line-strong);
+}
+.segmented__option {
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--color-line-strong);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  font-size: var(--text-small);
+  letter-spacing: 0.02em;
+}
+.segmented__option:last-child {
+  border-right: none;
+}
+.segmented__option[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+.segmented__option:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Buttons — flat, bordered; the primary action inverts to charcoal. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--color-ink);
+  border-radius: 0;
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+}
+.btn--primary {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+  border-color: var(--color-line-strong);
+}
+.btn--ghost {
+  border: none;
+  padding: var(--space-1) var(--space-2);
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+.btn--ghost:hover {
+  color: var(--color-ink);
+}
+
+/* ── Drop zone ─────────────────────────────────────────────────────────────── */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  border: 1px dashed var(--color-line-strong);
+  border-radius: 0;
+  background: var(--color-bg);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+.dropzone--active {
+  border-color: var(--color-ink);
+  background: var(--color-field);
+}
+.dropzone--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.dropzone__hint {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+/* ── Thumbnails ────────────────────────────────────────────────────────────── */
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.thumb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.thumb__frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+}
+.thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumb__remove {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line-strong);
+  cursor: pointer;
+  line-height: 1;
+  font-size: 0.9rem;
+}
+.thumb__remove:hover:not(:disabled) {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+.thumb__remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.thumb__name {
+  font-size: var(--text-small);
+  color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.thumb__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+/* ── Inline rejection / error messages ─────────────────────────────────────── */
+.rejections {
+  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.rejection {
+  font-size: var(--text-small);
+  color: var(--color-error);
+}
+
+/* ── Per-image hint rows (params form) ─────────────────────────────────────── */
+.hintlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.hintrow {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+.hintrow__thumb {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border: 1px solid var(--color-line);
+  background: var(--color-field);
+}
+
+/* ── Generate bar ──────────────────────────────────────────────────────────── */
+.generate {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+.generate__hint {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* ── Batch grid + result tiles (component C4) ──────────────────────────────── */
+.batchnote {
+  margin-top: var(--space-2);
+}
+
+/* Responsive reflow: 3–4 cols desktop → 2 tablet → 1 phone (NFR-7 / §2.1).
+   `auto-fill` + a min track width drives column count purely by viewport;
+   no fixed pixel widths, so the editorial layout holds at every breakpoint. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Fixed aspect box (set per `aspectRatio` inline) so reflow never janks while
+   results stream in; the image is the hero — flat field, no card chrome. */
+.tile__frame {
+  position: relative;
+  width: 100%;
+  background: var(--color-field);
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+}
+.tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Dimmed product placeholder shown under the QUEUED / GENERATING overlay. */
+.tile__img--ghost {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+
+.tile__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.tile__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 1.25rem;
+}
+.tile__provider {
+  letter-spacing: var(--label-tracking);
+}
+/* DONE tile footer: provider meta on the left, single-post download on the right. */
+.tile__donerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.tile__download {
+  flex-shrink: 0;
+}
+
+.tile__error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+.tile__hint {
+  color: var(--color-ink);
+}
+.tile__retry {
+  margin-top: var(--space-1);
+  align-self: flex-start;
+}
+
+.batchactions {
+  margin-top: var(--space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* ── Responsive baseline ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --text-display: 1.625rem;
+  }
+  .content {
+    padding: var(--space-8) var(--space-4) var(--space-8);
+  }
+  .thumbs {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  /* Phone: single, full-width column of tiles. */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  /* Tablet: two columns. */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
