@@ -20,6 +20,8 @@ import { isReadyToGenerate, useBatchStore } from "@/lib/client/store";
 export function StudioShell() {
   const entries = useBatchStore((s) => s.entries);
   const generate = useBatchStore((s) => s.generate);
+  const runExample = useBatchStore((s) => s.runExample);
+  const exampleLoading = useBatchStore((s) => s.exampleLoading);
   const connection = useBatchStore((s) => s.batch.status);
   const launchError = useBatchStore((s) => s.batch.launchError);
 
@@ -47,6 +49,19 @@ export function StudioShell() {
             {ready
               ? "Ready — one styled post will be generated per product image."
               : "Add at least one product image and a reference image to begin."}
+          </span>
+        </div>
+        <div className="generate">
+          <button
+            type="button"
+            className="btn btn--ghost"
+            disabled={busy || exampleLoading}
+            onClick={() => void runExample()}
+          >
+            {exampleLoading ? "Loading example…" : "Run example batch"}
+          </button>
+          <span className="generate__hint">
+            No images handy? Generate a ready-made batch (3 products + 1 reference).
           </span>
         </div>
         {launchError && <p className="rejection batchnote">{launchError}</p>}

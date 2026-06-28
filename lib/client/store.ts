@@ -116,6 +116,8 @@ export type BatchStore = {
   entries: UploadEntry[];
   params: BatchParams;
   batch: BatchState;
+  /** True while the bundled example batch is being fetched + uploaded (pre-generate). */
+  exampleLoading: boolean;
 
   /** Validate + add + eagerly upload files for a bucket; returns rejections. */
   addFiles: (files: File[], kind: UploadKind) => Promise<{ rejected: Rejection[] }>;
@@ -143,6 +145,13 @@ export type BatchStore = {
    * then open the SSE stream. On a launch failure it rolls the grid back (§5j).
    */
   generate: () => Promise<void>;
+  /**
+   * One-click demo: fetch the bundled example reference + product images and run
+   * them through the SAME validate → upload → generate path a manual batch uses
+   * (so it exercises Blob upload, SSRF checks, and the real orchestrator), then
+   * stream. Best-effort: surfaces a launch error on any failure.
+   */
+  runExample: () => Promise<void>;
   /** Targeted retry of one failed tile; reopens a settled stream if needed (§5d). */
   retry: (itemId: string) => Promise<void>;
   /** Tear down the stream and clear the grid (uploads/params are kept). */
@@ -188,6 +197,33 @@ export function isReadyToGenerate(entries: UploadEntry[]): boolean {
     references >= 1 &&
     references <= MAX_REFERENCE_IMAGES
   );
+}
+
+/** The bundled example assets served from `public/examples/` (kind preserved). */
+const EXAMPLE_ASSETS: ReadonlyArray<{ name: string; kind: UploadKind }> = [
+  { name: "product-1.jpg", kind: "product" },
+  { name: "product-2.jpg", kind: "product" },
+  { name: "product-3.jpg", kind: "product" },
+  { name: "reference.jpg", kind: "reference" },
+];
+
+/**
+ * Poll the store until every selected file has finished uploading (ready), or one
+ * errors, or the timeout elapses. Used by `runExample` to wait for the eager
+ * uploads kicked off by `addFiles` before submitting the job.
+ */
+async function awaitUploadsSettled(
+  getState: () => BatchStore,
+  timeoutMs = 60_000,
+): Promise<boolean> {
+  const start = Date.now();
+  for (;;) {
+    const entries = getState().entries;
+    if (entries.length > 0 && entries.some((e) => e.status === "error")) return false;
+    if (isReadyToGenerate(entries)) return true;
+    if (Date.now() - start > timeoutMs) return false;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
 }
 
 /** The live SSE stream controller (module-level: one batch in view at a time). */
@@ -281,6 +317,7 @@ export const useBatchStore = create<BatchStore>()((set, get) => ({
   entries: [],
   params: INITIAL_PARAMS,
   batch: { ...EMPTY_BATCH },
+  exampleLoading: false,
 
   addFiles: async (files, kind) => {
     const cap = kind === "product" ? MAX_PRODUCT_IMAGES : MAX_REFERENCE_IMAGES;
@@ -437,6 +474,47 @@ export const useBatchStore = create<BatchStore>()((set, get) => ({
         get()._setConnection(state);
       },
     });
+  },
+
+  runExample: async () => {
+    if (get().exampleLoading) return;
+    set({ exampleLoading: true });
+    const fail = () =>
+      set({
+        batch: {
+          ...EMPTY_BATCH,
+          launchError: "Couldn't load the example batch — please try again.",
+        },
+      });
+    try {
+      // Start clean, then fetch the bundled assets and feed them through the very
+      // same path a manual upload uses (validate → eager upload → generate).
+      get().reset();
+      const loaded: Array<{ file: File; kind: UploadKind }> = [];
+      for (const { name, kind } of EXAMPLE_ASSETS) {
+        const res = await fetch(`/examples/${name}`);
+        if (!res.ok) throw new Error(`example asset ${name} → HTTP ${res.status}`);
+        const blob = await res.blob();
+        loaded.push({ file: new File([blob], name, { type: "image/jpeg" }), kind });
+      }
+      await get().addFiles(
+        loaded.filter((f) => f.kind === "product").map((f) => f.file),
+        "product",
+      );
+      await get().addFiles(
+        loaded.filter((f) => f.kind === "reference").map((f) => f.file),
+        "reference",
+      );
+      if (!(await awaitUploadsSettled(get))) {
+        fail();
+        return;
+      }
+      await get().generate();
+    } catch {
+      fail();
+    } finally {
+      set({ exampleLoading: false });
+    }
   },
 
   retry: async (itemId) => {

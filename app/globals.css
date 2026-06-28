@@ -453,6 +453,9 @@ hr {
   gap: var(--space-6);
   flex-wrap: wrap;
 }
+.generate + .generate {
+  margin-top: var(--space-4);
+}
 .generate__hint {
   font-size: var(--text-small);
   color: var(--color-muted);
