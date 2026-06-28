@@ -72,20 +72,29 @@ Deep dives: [`docs/architecture.md`](docs/architecture.md) · [`docs/product-flo
 
 ---
 
-## Providers & the honest output story
+## Providers — how generation actually works
 
-The brief asks for posts **styled to the reference** that **preserve the product** — two requirements that pull against each other on *free* models:
+The brief wants posts **styled to the reference** that **keep the product intact**. Each batch runs in **two steps, both on HuggingFace**:
 
-| Provider | Preserves the product (img2img)? | Free? |
-|---|---|---|
-| **HuggingFace FLUX.1-Kontext** (primary) | ✅ true image-edit — keeps the product, restyles per the prompt | tiny free credit, then ~cents/image |
-| Cloudflare Workers AI (FLUX/SDXL) | ⚠️ weak at composition | 10k neurons/day |
-| Gemini 2.5 Flash Image ("Nano Banana") | ✅ best — native multi-image conditioning | paid (free image-gen limit = 0) |
-| Pollinations `gptimage` | ❌ text-to-image (ignores the input image) | unlimited |
+1. **Read the reference's mood — once per batch.** A vision model (`google/gemma-3-27b-it`) describes the reference's *lighting, colour grade, and atmosphere* as a short paragraph of text, deliberately ignoring the objects in it (see the extracted mood in the example above).
+2. **Edit each product — once per image.** FLUX.1-Kontext (a true image-**edit** model) takes the **product photo** and re-lights it to that mood. The product is the *only* image in the frame, so it stays exact; the reference's look arrives as the text from step 1.
 
-**The hard part — and the judgment call.** Kontext preserves the product but is **single-image**: it can't take a *second* image (the reference) as a style input. The obvious hack — compositing product + reference **side-by-side** into one frame — I tried and **rejected**: Kontext intermittently ignored the reference, echoed its objects into the result, or returned a collage. Unreliable is worse than absent.
+**Failover.** Step 2 runs a chain — **HuggingFace Kontext → Cloudflare Workers AI** — so if HuggingFace is rate-limited or out of credit, the batch still finishes on Cloudflare. The order is one env var (`PROVIDER_CHAIN`); every model is an `ImageProvider` adapter behind a single interface, and adapters for Gemini, Replicate, and Pollinations ship too (off by default). If the step-1 vision read fails, the prompt simply falls back to the brief text — the batch never blocks on it.
 
-The shipped approach instead **reads the reference's *mood* with a vision model once per job** (`google/gemma-3-27b-it` on HF → "dramatic warm directional light, teal-and-orange cinematic grade, cozy/mysterious atmosphere…", objects deliberately omitted), then runs a **product-only** Kontext edit conditioned on that text. Result: the product is preserved exactly, the reference's mood is applied **consistently across the whole batch**, and there's **zero reference-leak** (nothing but the product is ever in frame). Pixel-exact reference matching wants a paid IP-Adapter/Gemini model — a one-env-var swap behind the same interface — but for "match the mood," vision-to-text is the right free, reliable call. See [`docs/state/decisions.md`](docs/state/decisions.md).
+### Why text, not the reference image — the judgment call
+
+Kontext is **single-image**: it can't take a *second* image (the reference) as a style input. The obvious workaround — pasting product + reference **side-by-side** into one frame — I built and then **threw away**: Kontext kept ignoring the reference, copying its objects into the output, or returning a collage. Routing the mood through text is what makes the look **consistent across the whole batch** with **zero reference-leak** (nothing but the product is ever in the frame).
+
+What each provider offers, and why the chain is what it is:
+
+| Provider | Role | Preserves the product? | Cost |
+|---|---|---|---|
+| **HuggingFace FLUX.1-Kontext** | **Primary** — in the chain | ✅ true image-edit | small free credit, then ~¢/image |
+| **Cloudflare Workers AI** | **Fallback** — in the chain | ⚠️ weaker composition | 10k neurons/day free |
+| Gemini 2.5 Flash ("Nano Banana") | available, off by default | ✅ best — native multi-image | paid (free image limit = 0) |
+| Pollinations `gptimage` | available, off by default | ❌ text-to-image (drops the product) | free |
+
+Pixel-exact reference matching — copying the reference's *look* and not just its *mood* — would want a paid IP-Adapter / Gemini model, a one-env-var swap behind the same interface. For "match the mood" on a free budget, vision-to-text is the right call. Full reasoning in [`docs/state/decisions.md`](docs/state/decisions.md).
 
 ---
 
