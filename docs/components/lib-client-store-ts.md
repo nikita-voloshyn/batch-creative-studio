@@ -12,7 +12,8 @@ The single Zustand store backing the whole client UI: it holds the user's file s
 
 ## Public Interface
 - `useBatchStore` — Zustand hook exposing `BatchStore` (state + actions below).
-- Actions: `addFiles(files, kind) → Promise<{ rejected: Rejection[] }>`, `removeEntry(id)`, `retryUpload(id)`, `setEntryHint(id, hint)`, `setAspectRatio(ar)`, `setBrief(s)`, `reset()`, `buildCreateJobRequest() → CreateJobRequest | null`, `generate() → Promise<void>`, `retry(itemId) → Promise<void>`, `resetBatch()`.
+- Actions: `addFiles(files, kind) → Promise<{ rejected: Rejection[] }>`, `removeEntry(id)`, `retryUpload(id)`, `setEntryHint(id, hint)`, `setAspectRatio(ar)`, `setBrief(s)`, `reset()`, `buildCreateJobRequest() → CreateJobRequest | null`, `generate() → Promise<void>`, `runExample() → Promise<void>`, `retry(itemId) → Promise<void>`, `resetBatch()`.
+- State flag: `exampleLoading: boolean` — true while the bundled example batch is being fetched + uploaded (before `generate`).
 - Internal (SSE client → store) actions, prefixed `_`: `_mergeSnapshot(job)`, `_applyEvent(name, data)`, `_setConnection(state)`, `_upload(id)`.
 - Pure selectors: `selectProducts(entries)`, `selectReferences(entries)`, `isReadyToGenerate(entries) → boolean`.
 - Exported types: `UploadStatus`, `UploadEntry`, `Rejection`, `BatchParams`, `CreateJobRequest`, `TileStatus`, `BatchConnection`, `BatchItem`, `BatchState`, `BatchStore`.
@@ -22,6 +23,7 @@ The single Zustand store backing the whole client UI: it holds the user's file s
 - `_upload`: calls `uploadFile`, patches entry to `uploaded` + `blobUrl` on success or `error` + message on `UploadError`.
 - `buildCreateJobRequest`: returns `null` unless `isReadyToGenerate`; otherwise assembles `{ productImageUrls, referenceImageUrls, params }` from uploaded blobUrls; `perImageHints` keyed by product `blobUrl` (trimmed, omitted if empty); `brief` omitted if blank.
 - `generate`: builds request (no-op if null), renders N optimistic `queued` placeholders (preview from matching entry), `createJob(request, randomUUID)`, then `openJobStream`. On create failure rolls grid back to empty with `launchError` (uploads/params kept).
+- `runExample`: one-click demo — `reset()`, fetches the bundled assets from `/examples/` (3 products + 1 reference), feeds them through the same `addFiles` → eager-upload path, waits for the uploads to settle, then `generate()`. Best-effort: surfaces `launchError` on any failure; toggles `exampleLoading`.
 - `retry(itemId)`: optimistically flips the tile to `queued`, calls `retryItem`; on failure re-applies an `item.error` (404 → "no longer available"). If the stream already settled `done`, calls `streamController.reopen()`.
 - `_mergeSnapshot`: merges an authoritative `Job`, reconciling `itemId → index` by submission order (fallback: productImageUrl match), rebuilds `itemIndexById`, recomputes `total/done/failed`.
 - `_applyEvent`: routes `job.progress` to counters, ignores `job.done` (terminal UI driven by connection), and applies item events idempotently via `reduceItemEvent` — never clobbers an already-shown result.

@@ -1,7 +1,7 @@
 # Documentation Coverage Registry
 
 **Last full audit:** 2026-06-28
-**Coverage:** 52/52 documented (100%)
+**Coverage:** 53/53 documented (100%)
 
 ## Registry
 
@@ -53,6 +53,7 @@
 | ReferenceNormalize | `lib/providers/reference-normalize.ts` | `docs/components/lib-providers-reference-normalize-ts.md` | — | — | Current |
 | ProviderRegistry | `lib/providers/registry.ts` | `docs/components/lib-providers-registry-ts.md` | — | — | Current |
 | ReplicateProvider | `lib/providers/replicate.ts` | `docs/components/lib-providers-replicate-ts.md` | — | — | Current |
+| ReferenceStyleExtractor | `lib/providers/style-extract.ts` | `docs/components/lib-providers-style-extract-ts.md` | 2026-06-28 | 2026-06-28 | Current |
 | ProviderTypes | `lib/providers/types.ts` | `docs/components/lib-providers-types-ts.md` | — | — | Current |
 | ProviderRateLimiter | `lib/ratelimit/token-bucket.ts` | `docs/components/lib-ratelimit-token-bucket-ts.md` | — | — | Current |
 | StateStoreSelector | `lib/state/index.ts` | `docs/components/lib-state-index-ts.md` | — | — | Current |
