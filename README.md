@@ -102,7 +102,7 @@ Pixel-exact reference matching — copying the reference's *look* and not just i
 
 **In scope (and done):** upload + validation, batch generation with bounded concurrency, the reliability core (retries · **Kontext → Cloudflare failover**, proven live · partial-failure · targeted retry), **reference-mood transfer via once-per-job vision extraction → product-only edit**, progressive SSE rendering with reconnect, style consistency (shared prompt + per-batch seed + the same extracted mood across the batch), export (single + zip), editorial visual language, server-side secrets + SSRF guards + rate limiting, **Upstash Redis** shared state for multi-instance prod, and a Vercel deploy.
 
-**Deliberately deferred (full-product, not half-day):** auth/multi-user, batch history/permalinks, a durable queue (the SSE handler hosts orchestration in-flight), cross-instance SSE pub/sub for mid-batch reconnects, and enabling Replicate. Each is noted in `docs/state/decisions.md` with the reasoning — the point was a working, reliable batch with clear trade-offs, not gold-plating.
+**Deliberately deferred (full-product scope, beyond this ~4-hour build):** auth/multi-user, batch history/permalinks, a durable queue (the SSE handler hosts orchestration in-flight), cross-instance SSE pub/sub for mid-batch reconnects, and enabling Replicate. Each is noted in `docs/state/decisions.md` with the reasoning — the point was a working, reliable batch with clear trade-offs, not gold-plating.
 
 ---
 
@@ -131,8 +131,12 @@ Vercel (`vercel --prod`). Set the env vars above on the project (the Blob + Upst
 
 ## Time spent
 
-<!-- TODO (author): fill in actual time -->
-`~__h` of focused engagement.
+**~4 hours** of focused, AI-assisted engagement (built with Claude Code — see *How this was built* above). Roughly:
+
+- **~1h** — reading the brief, the spec + architecture, and decomposing the work;
+- **~1.5h** — building the pipeline: the provider abstraction, the reliability core (retry / failover / rate-limit / worker pool), the SSE stream, and the UI;
+- **~1h** — live-debugging the *free-provider reality*: what actually preserves the product, the side-by-side-stitch dead-end, and the vision-to-text mood fix;
+- **~0.5h** — the worked example, the one-click demo, polish, and the Vercel deploy.
 
 ## Repo map
 
