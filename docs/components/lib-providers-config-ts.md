@@ -13,7 +13,8 @@ Env-driven provider/model/quota configuration: chain order, model ids, RPM, dail
 ## Public Interface
 - `type QuotaConfig` — `{ dailyCap: number; rpm: number }`.
 - `type CloudflareModelCaps` — `{ acceptsImageInput, encoding: "multipart" | "json", supportsSeed, supportsDimensions }`.
-- `providerChainIds(): string[]` — ordered ids from `PROVIDER_CHAIN` (default `huggingface,pollinations,cloudflare`), lowercased/trimmed.
+- `providerChainIds(): string[]` — ordered ids from `PROVIDER_CHAIN` (default `huggingface,cloudflare`), lowercased/trimmed.
+- `huggingfaceVisionModels(): string[]` — ordered VLMs for the once-per-job reference-mood extraction (`style-extract.ts`); `HUGGINGFACE_VISION_MODEL` prepends a preferred id.
 - Secret accessors (return `undefined` when unset, NOT re-exported from the barrel): `geminiApiKey()`, `cloudflareAccountId()`, `cloudflareApiToken()`, `replicateApiToken()`, `pollinationsToken()`, `huggingfaceToken()`.
 - Model accessors: `geminiModel()`, `cloudflareModel()`, `replicateModel()`, `replicateImageInputKey()`, `pollinationsModel()`, `huggingfaceModel()`, `huggingfaceProvider()`.
 - `cloudflareModelCaps(model?): CloudflareModelCaps` — classify request shape/capabilities by model id.
@@ -33,7 +34,7 @@ Env-driven provider/model/quota configuration: chain order, model ids, RPM, dail
 - `lib/providers/types.ts` — `AspectRatio` type.
 
 ## Key Decisions
-- Defaults reflect live-verified choices (decisions.md 2026-06-28): HF FLUX.1-Kontext-dev via `fal-ai` heads the free chain (only free option that preserves the product); Pollinations default `gptimage` (the free-token img2img model — premium models 500 even with the token); Cloudflare default FLUX.2 [klein] keeps image-reference conditioning.
+- Defaults reflect live-verified choices (decisions.md 2026-06-28): the default chain is `huggingface,cloudflare` — HF FLUX.1-Kontext-dev via `fal-ai` heads it (only free option that preserves the product), Cloudflare default FLUX.2 [klein] is the fallback. Gemini, Pollinations (default `gptimage`), and Replicate adapters ship too but are **off by default** (not in the chain).
 - Secret accessors are intentionally NOT re-exported from `index.ts` — they stay internal so a credential cannot leak through the package barrel.
 - Conservative RPM defaults for free tiers (HF/Pollinations) because free concurrency is tight; all env-overridable.
 

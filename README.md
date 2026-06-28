@@ -121,7 +121,7 @@ Beyond the deferred infrastructure above, the things I'd reach for next — most
 
 ## How this was built (AI tooling)
 
-Built with **Claude Code**, scaffolded by **[Forgeline](https://github.com/nikita-voloshyn/forgeline)** — a Claude Code plugin I built that turns a project's spec + stack into a tailored multi-agent `.claude/` workspace (domain agents, skills, hooks, permissions) through a guided setup. The flow for this project:
+Built with **Claude Code**, scaffolded by **[Forgeline](https://github.com/nikita-voloshyn/forgeline)** — **a Claude Code plugin I built and maintain myself** — which turns a project's spec + stack into a tailored multi-agent `.claude/` workspace (domain agents, skills, hooks, permissions) through a guided setup. So the multi-agent setup that produced this repo is itself my own tool. The flow for this project:
 
 1. **Spec first** — read the brief, then wrote the tech spec / architecture before any code ([`docs/architecture.md`](docs/architecture.md), [`docs/product-flow.md`](docs/product-flow.md)).
 2. **Scaffold the team** — Forgeline's `/setup-agents` read that spec and generated a workspace tailored to it: domain agents (`frontend` / `backend` / `providers` / `testing` / `security-backend`) under a supervisor, each with a strict ownership boundary, plus a fresh-context `reviewer` and a `/plan → /assign → /execute` skill pipeline.
@@ -154,7 +154,7 @@ Vercel (`vercel --prod`). Set the env vars above on the project (the Blob + Upst
 **~4 hours** of focused, AI-assisted engagement (Claude Code + Forgeline — see *How this was built* above), in order:
 
 1. **~45 min** — analysing the brief and writing the tech spec / requirements.
-2. **~25 min** — generating the multi-agent system with **[Forgeline](https://github.com/nikita-voloshyn/forgeline)**, tailored to that spec.
+2. **~25 min** — generating the multi-agent system with **[Forgeline](https://github.com/nikita-voloshyn/forgeline)** (my own Claude Code plugin), tailored to that spec.
 3. **~45 min** — the planning stage (`/plan` → `/assign`), wiring up the providers, and the overall architecture.
 4. **~30–60 min** — Claude Code executing the plan (`/execute`).
 5. **~60 min** — debugging and checking the output against the brief (the free-provider reality, the stitch dead-end → vision-to-text fix, the worked example, and the deploy).

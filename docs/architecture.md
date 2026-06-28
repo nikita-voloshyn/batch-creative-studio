@@ -7,6 +7,8 @@
 > **Ownership legend** (single-writer per module): `FE` frontend · `BE` backend · `PV` providers · `TS` testing. Every file in §12 has exactly one owner.
 >
 > **Cross-doc alignment (applied throughout):** pool-size config is `POOL_SIZE`; per-image hints are `perImageHints` (in `Job.params`); the result Blob key is the **per-item, attempt-independent** key `results/{jobId}/{itemId}.{ext}` (last-writer-wins — every successful attempt overwrites the same object); `POST /api/uploads` request is `{ filename, contentType, kind }` (no client-declared size); `POST /api/jobs/:id/items/:itemId/retry` returns `{ ok: true }`.
+>
+> **⚠️ Provider chain — shipped vs. as-designed (updated 2026-06-28).** The abstraction in this doc (the `ImageProvider` interface, failover engine, retry, rate-limit, SSE, state machine, ownership boundaries) is all **as-shipped**. The **concrete provider chain evolved during live testing**, so where this doc says "Gemini-first" read it as the *original design*: the shipped default is **`PROVIDER_CHAIN=huggingface,cloudflare`** with **HuggingFace FLUX.1-Kontext** as the product-preserving primary, and the reference's *mood* is applied via a **once-per-job vision-extraction step** (`lib/providers/style-extract.ts`) instead of image-conditioning. Gemini ("Nano Banana"), Pollinations, and Replicate ship as adapters behind the same interface but are **off by default**. Full reasoning: [`docs/state/decisions.md`](state/decisions.md) (2026-06-28) and the README's *Providers* section.
 
 ---
 
