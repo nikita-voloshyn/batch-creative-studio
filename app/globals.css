@@ -589,3 +589,97 @@ hr {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ── On-page submission sections (The product / How it was built / The code) ─── */
+.about__num {
+  display: block;
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--label-tracking);
+  color: var(--color-faint);
+}
+.about__title {
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin-top: var(--space-2);
+}
+.about__lead {
+  color: var(--color-muted);
+  max-width: 60ch;
+  margin-top: var(--space-3);
+}
+.about__sub {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-semibold);
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-2);
+}
+.about p {
+  max-width: 72ch;
+  margin-top: var(--space-3);
+  line-height: 1.55;
+}
+.about__override {
+  border-left: 2px solid var(--color-line-strong);
+  padding-left: var(--space-4);
+}
+.about__fine {
+  font-size: var(--text-small);
+  color: var(--color-muted);
+}
+.about__list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  max-width: 72ch;
+}
+.about__list li {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-line);
+  font-size: var(--text-small);
+  line-height: 1.5;
+}
+.about code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--color-field);
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+}
+.stats {
+  display: flex;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.stat__num {
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.stat__label {
+  font-size: var(--text-label);
+  text-transform: uppercase;
+  letter-spacing: var(--label-tracking);
+  color: var(--color-muted);
+}
+.link {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link:hover {
+  color: var(--color-muted);
+}
+.link--lg {
+  font-size: var(--text-heading);
+  font-weight: var(--weight-medium);
+}
