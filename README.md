@@ -6,6 +6,28 @@ Upload **N product images + 1–2 reference images**, hit **Generate**, and get 
 
 ---
 
+## Example — one batch, one consistent look
+
+One **reference** sets the mood; three very different product photos come back as a cohesive set. The reference's mood is read **once per job** by a vision model, then each product is re-lit to match it — the product itself is left untouched.
+
+**Reference (style / mood):**
+
+<img src="docs/examples/reference.jpg" width="200" alt="style reference">
+
+> Mood the vision model extracted from it: *"soft, diffused lighting; warm, muted beige and creamy tones with a subtle golden warmth; a desaturated, slightly vintage grade; a simple, seamless backdrop; calm, minimalist, understated elegance."*
+
+| Product image (input) | → | Generated post (output) |
+|:---:|:---:|:---:|
+| <img src="docs/examples/product-1.jpg" width="200"> | → | <img src="docs/examples/output-1.jpg" width="200"> |
+| <img src="docs/examples/product-2.jpg" width="200"> | → | <img src="docs/examples/output-2.jpg" width="200"> |
+| <img src="docs/examples/product-3.jpg" width="200"> | → | <img src="docs/examples/output-3.jpg" width="200"> |
+
+Each product keeps its exact shape, materials, and controls — the clock display, the wireless-charging pad, the wood grain and linen shade — while the harsh blue / clinical-white backgrounds are replaced by the reference's warm, seamless mood. The **same** look lands on all three, which is the "steady visual style across every output" the brief asks for.
+
+> Generated live through this app's pipeline (HuggingFace FLUX.1-Kontext). Free models vary run-to-run; this is a representative batch.
+
+---
+
 ## Quick start
 
 ```bash
