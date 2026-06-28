@@ -50,7 +50,7 @@ export function AboutBuild() {
         <h3 className="about__sub">Toolset</h3>
         <ul className="about__list">
           <li>
-            <strong>Claude Code</strong> (CLI) on <strong>Claude Opus 4.x</strong> — the primary
+            <strong>Claude Code</strong> (CLI) on <strong>Claude Opus 4.8</strong> — the primary
             build agent: wrote most of the code, ran the test/build gates, deployed.
           </li>
           <li>
@@ -95,11 +95,11 @@ export function AboutBuild() {
             <span className="stat__label">Total</span>
           </div>
           <div className="stat">
-            <span className="stat__num">~1h30</span>
+            <span className="stat__num">~2h</span>
             <span className="stat__label">Hands-on (me)</span>
           </div>
           <div className="stat">
-            <span className="stat__num">~2h30</span>
+            <span className="stat__num">~2h</span>
             <span className="stat__label">AI working</span>
           </div>
         </div>

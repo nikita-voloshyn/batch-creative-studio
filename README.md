@@ -151,7 +151,7 @@ Vercel (`vercel --prod`). Set the env vars above on the project (the Blob + Upst
 
 ## Time spent
 
-Three numbers: **total ~4h · hands-on (me) ~1h30 · AI/LLM working ~2h30** (Claude Code + Forgeline — see *How this was built* above). In order:
+Three numbers: **total ~4h · hands-on (me) ~2h · AI/LLM working ~2h** (Claude Code on Claude Opus 4.8 + Forgeline — see *How this was built* above). In order:
 
 1. **~45 min** — analysing the brief and writing the tech spec / requirements.
 2. **~25 min** — generating the multi-agent system with **[Forgeline](https://github.com/nikita-voloshyn/forgeline)** (my own Claude Code plugin), tailored to that spec.
