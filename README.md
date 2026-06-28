@@ -106,9 +106,29 @@ Pixel-exact reference matching — copying the reference's *look* and not just i
 
 ---
 
+## Possible improvements / what I'd add next
+
+Beyond the deferred infrastructure above, the things I'd reach for next — most are a small change behind the existing seams:
+
+- **Pixel-exact reference matching.** Swap the primary to an image-conditioned model (Gemini "Nano Banana", or a FLUX Redux / IP-Adapter on Replicate) to copy the reference's exact *look*, not just its mood — one `PROVIDER_CHAIN` change behind the same `ImageProvider` interface.
+- **Editable extracted mood.** Surface the vision model's mood text in the UI and let the user tweak it before generating, so the look is directly steerable.
+- **Variant generation + auto-pick.** Generate 2–3 variants per product and surface the best (free models vary run-to-run), plus a one-click "regenerate this tile".
+- **Per-image briefs in the UI.** The backend already accepts `perImageHints`; expose a per-product caption field.
+- **Durable runs.** A real queue + persistence so a batch survives a redeploy or a closed tab, with batch history and shareable permalinks.
+- **Cold-start mitigation + a small provider-health / usage panel**, and **end-to-end tests** (Playwright) over the upload → generate → render flow on top of the reliability-core unit tests.
+
+---
+
 ## How this was built (AI tooling)
 
-Built with **Claude Code** running a **multi-agent workspace** (the `forgeline` plugin): domain agents (`frontend` / `backend` / `providers` / `testing` / `security-backend`) under a supervisor, driven through a **`/plan` → `/assign` → `/execute`** pipeline with a **fresh-context reviewer** after every implementer task and an adversarial multi-dimension review at the end. The audit trail lives in [`docs/plans/`](docs/plans/) (plan, dispatch, report) and [`docs/reviews/`](docs/reviews/); a `security-backend` review is in [`docs/security/`](docs/security/). Each task was verified (lint · types · 106 tests · build) before moving on, and contract divergences (e.g. Vercel Blob's real upload API, the seed INT32 range, the free-provider reality) were caught by live testing and folded back in.
+Built with **Claude Code**, scaffolded by **[Forgeline](https://github.com/nikita-voloshyn/forgeline)** — a Claude Code plugin I built that turns a project's spec + stack into a tailored multi-agent `.claude/` workspace (domain agents, skills, hooks, permissions) through a guided setup. The flow for this project:
+
+1. **Spec first** — read the brief, then wrote the tech spec / architecture before any code ([`docs/architecture.md`](docs/architecture.md), [`docs/product-flow.md`](docs/product-flow.md)).
+2. **Scaffold the team** — Forgeline's `/setup-agents` read that spec and generated a workspace tailored to it: domain agents (`frontend` / `backend` / `providers` / `testing` / `security-backend`) under a supervisor, each with a strict ownership boundary, plus a fresh-context `reviewer` and a `/plan → /assign → /execute` skill pipeline.
+3. **Plan → assign → execute** — `/plan` decomposed the work into tasks with domain owners, `/assign` mapped agents + skills to each, and `/execute` ran them one at a time, with the `reviewer` re-reviewing from fresh context after every task and an adversarial multi-dimension review at the end.
+4. **Verify + reconcile** — each task was gated on lint · types · 106 tests · build before moving on, and contract divergences caught by live testing (Vercel Blob's real upload API, the seed INT32 range, the free-provider reality, the side-by-side-stitch dead-end) were folded back into [`docs/state/decisions.md`](docs/state/decisions.md).
+
+The full audit trail is in the repo: [`docs/plans/`](docs/plans/) (plan · dispatch · report), [`docs/reviews/`](docs/reviews/), and the [`docs/security/`](docs/security/) review.
 
 ---
 
@@ -131,12 +151,13 @@ Vercel (`vercel --prod`). Set the env vars above on the project (the Blob + Upst
 
 ## Time spent
 
-**~4 hours** of focused, AI-assisted engagement (built with Claude Code — see *How this was built* above). Roughly:
+**~4 hours** of focused, AI-assisted engagement (Claude Code + Forgeline — see *How this was built* above), in order:
 
-- **~1h** — reading the brief, the spec + architecture, and decomposing the work;
-- **~1.5h** — building the pipeline: the provider abstraction, the reliability core (retry / failover / rate-limit / worker pool), the SSE stream, and the UI;
-- **~1h** — live-debugging the *free-provider reality*: what actually preserves the product, the side-by-side-stitch dead-end, and the vision-to-text mood fix;
-- **~0.5h** — the worked example, the one-click demo, polish, and the Vercel deploy.
+1. **~45 min** — analysing the brief and writing the tech spec / requirements.
+2. **~25 min** — generating the multi-agent system with **[Forgeline](https://github.com/nikita-voloshyn/forgeline)**, tailored to that spec.
+3. **~45 min** — the planning stage (`/plan` → `/assign`), wiring up the providers, and the overall architecture.
+4. **~30–60 min** — Claude Code executing the plan (`/execute`).
+5. **~60 min** — debugging and checking the output against the brief (the free-provider reality, the stitch dead-end → vision-to-text fix, the worked example, and the deploy).
 
 ## Repo map
 
